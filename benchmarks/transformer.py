@@ -151,6 +151,7 @@ def train(train_data, model, criterion, optimizer, bptt, ntokens):
         output = output.to(targets.device)
 
         loss = criterion(output.view(-1, ntokens), targets)
+        total_loss += loss.item()
         scaler.scale(loss).backward()
 
         scaler.unscale_(optimizer)
@@ -158,7 +159,6 @@ def train(train_data, model, criterion, optimizer, bptt, ntokens):
         scaler.step(optimizer)
         scaler.update()
 
-        total_loss += loss.item()
         log_interval = 200
         if batch % log_interval == 0 and batch > 0:
             cur_loss = total_loss / log_interval

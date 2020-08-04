@@ -142,7 +142,7 @@ def make_model(device, ntokens):
 def train(train_data, model, criterion, optimizer, bptt, ntokens):
     model.train()
     total_loss = 0.0
-    #scaler = GradScaler()
+    scaler = GradScaler()
     start_time = time.time()
     for batch, i in enumerate(range(0, train_data.size(0) - 1, bptt)):
         data, targets = get_batch(train_data, i, bptt)
@@ -151,12 +151,9 @@ def train(train_data, model, criterion, optimizer, bptt, ntokens):
         output = output.to(targets.device)
 
         loss = criterion(output.view(-1, ntokens), targets)
-        #scaler.scale(loss).backward()
-        #scaler.unscale_(optimizer)
-        #scaler.step(optimizer)
-        #scaler.update()
-
-        loss.backward()
+        scaler.scale(loss).backward()
+        scaler.step(optimizer)
+        scaler.update()
 
         total_loss += loss.item()
         log_interval = 200

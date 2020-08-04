@@ -142,7 +142,7 @@ def make_model(device, ntokens):
 def train(train_data, model, criterion, optimizer, bptt, ntokens):
     model.train()
     total_loss = 0.0
-    scaler = GradScaler()
+    #scaler = GradScaler()
     start_time = time.time()
     for batch, i in enumerate(range(0, train_data.size(0) - 1, bptt)):
         data, targets = get_batch(train_data, i, bptt)
@@ -151,14 +151,14 @@ def train(train_data, model, criterion, optimizer, bptt, ntokens):
         output = output.to(targets.device)
 
         loss = criterion(output.view(-1, ntokens), targets)
-        scaler.scale(loss).backward()
+        #scaler.scale(loss).backward()
+        #scaler.unscale_(optimizer)
+        #scaler.step(optimizer)
+        #scaler.update()
 
-        scaler.unscale_(optimizer)
-        torch.nn.utils.clip_grad_value_(model.parameters(), 0.01)
-        scaler.step(optimizer)
-        scaler.update()
+        loss.backward()
 
-        total_loss += loss
+        total_loss += loss.item()
         log_interval = 200
         if batch % log_interval == 0 and batch > 0:
             cur_loss = total_loss / log_interval
@@ -171,7 +171,7 @@ def train(train_data, model, criterion, optimizer, bptt, ntokens):
                     elapsed * 1000 / log_interval,
                     cur_loss,
                     math.exp(cur_loss),
-                    int(scaler.get_scale()),
+                    1,
                 )
             )
             total_loss = 0

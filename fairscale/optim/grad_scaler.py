@@ -20,7 +20,6 @@ class FairscaleGradScaler(GradScaler):
             growth_interval=growth_interval,
             enabled=enabled,
         )
-        self.init_scale = init_scale
 
     def _unscale_grads_(
         self, optimizer: torch.optim.Optimizer, inv_scale: float, found_inf: Any, allow_fp16: bool
